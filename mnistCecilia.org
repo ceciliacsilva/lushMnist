@@ -22,66 +22,79 @@
   
   (defvar *mnist-path* "/home/cecilia/eblearn-code/demos/mnist/")
   
-  (de mnist-main (treino-size detectar-size numeroImagem)
-    (let ((treino-db
-           (new dsource-idx3l-narrow
-                (new dsource-mnist 
-                     (load-matrix (concat-fname *mnist-path* "train-images-idx3-ubyte"))
-                     (load-matrix (concat-fname *mnist-path* "train-labels-idx1-ubyte"))
-                     32 32 0 0.01) ;;w h bias offset
-                treino-size 0)) ;;cria n do dsource-mnist
-          (detectar-db
-            (new dsource-idx3l-narrow
-                 (new dsource-mnist
-                      (load-matrix (concat-fname *mnist-path* "t10k-images-idx3-ubyte"))
-                      (load-matrix (concat-fname *mnist-path* "t10k-labels-idx1-ubyte"))
-                      32 32 0 0.01)
-                 detectar-size 0)) )
-      (let ((nOut 10)
-            (objetivo 1))
-        (let ((labels (int-matrix nOut))
-              (objetivos (float-matrix nOut nOut)))
-          (objetivos ()() (- objetivo))
-          (for (i 0 (- nOut 1))
-               (objetivos i i objetivo)
-               (labels i i))
-          ;(print labels)
-          ;(print (objetivos 1 1))
-          ;(print (objetivos 0 1))
-          (let ((treino-parametro (new idx1-ddparam 0 treino-size)))
-            ;(print treino-parametro)
-            (let ((lenet-rede
-                   (new-lenet5 32 32
-                         5 5
-                         2 2
-                         5 5
-                         2 2
-                         200  ;; dim of hidden layer
-                         10 treino-parametro)))
-              ;(print lenet-rede)
-              (let ((minha-rede
-                     (new idx3-supervised-module
-                          lenet-rede
-                          (new edist-cost labels 1 1 objetivos)
-                          (new max-classer labels))))
-                (let ((treino-rede
-                       (new supervised-gradient minha-rede treino-parametro)))
-                  (let ((treino-medida (new classifier-meter))
-                        (detectar-medida (new classifier-meter)))
-                    (==> :minha-rede:machine forget 1 2) ;;inicializa os pesos da rede aleatorios
-                    (==> treino-rede compute-diaghessian treino-db 200 0.02)
-                    (==> treino-rede train treino-db treino-medida 0.5 0)
-                    (printf "Rede treinada com %d imagens.\n\n" treino-size)
-                    (let ((detectar-rede treino-rede));;dps de treinada
-                      (printf "testando: ")
-                      ;(==> detectar-rede test detectar-db detectar-medida)
-                      (==> detectar-rede test-sample detectar-db detectar-medida numeroImagem)
-                      ;(==> detectar-medida display)
-                      )
-                    )))
-              ))
-          ))
-      ))
+  (de mnist-main (treino-size)
+      (let ((treino-db
+             (new dsource-idx3l-narrow
+                  (new dsource-mnist 
+                       (load-matrix (concat-fname *mnist-path* "train-images-idx3-ubyte"))
+                       (load-matrix (concat-fname *mnist-path* "train-labels-idx1-ubyte"))
+                       32 32 0 0.01) ;;w h bias offset
+                  treino-size 0))) ;;cria n do dsource-mnist
+        (let ((nOut 10)
+              (objetivo 1))
+          (let ((labels (int-matrix nOut))
+                (objetivos (float-matrix nOut nOut)))
+            (objetivos ()() (- objetivo))
+            (for (i 0 (- nOut 1))
+                 (objetivos i i objetivo)
+                 (labels i i))
+                                          ;(print labels)
+                                          ;(print (objetivos 1 1))
+                                          ;(print (objetivos 0 1))
+            (let ((treino-parametro (new idx1-ddparam 0 treino-size)))
+                                          ;(print treino-parametro)
+              (let ((lenet-rede
+                     (new-lenet5 32 32
+                                 5 5
+                                 2 2
+                                 5 5
+                                 2 2
+                                 200  ;; dim of hidden layer
+                                 10 treino-parametro)))
+                                          ;(print lenet-rede)
+                (let ((minha-rede
+                       (new idx3-supervised-module
+                            lenet-rede
+                            (new edist-cost labels 1 1 objetivos)
+                            (new max-classer labels))))
+                  (let ((treino-rede
+                         (new supervised-gradient minha-rede treino-parametro)))
+                    (let ((treino-medida (new classifier-meter)))
+                      (==> :minha-rede:machine forget 1 2) ;;inicializa os pesos da rede aleatorios
+                      (==> treino-rede compute-diaghessian treino-db 200 0.02)
+                      (==> treino-rede train treino-db treino-medida 0.5 0)
+                      (printf "Rede treinada com %d imagens.\n\n" treino-size)
+                      (eval
+                       `(lambda(detectar-size &optional (numero-imagem false))
+                          (let ((detectar-db
+                                 (new dsource-idx3l-narrow
+                                      (new dsource-mnist
+                                           (load-matrix (concat-fname *mnist-path* "t10k-images-idx3-ubyte"))
+                                           (load-matrix (concat-fname *mnist-path* "t10k-labels-idx1-ubyte"))
+                                           32 32 0 0.01)
+                                      detectar-size 0)))
+                            (let ((detectar-medida (new classifier-meter)))
+                              (let ((detectar-rede ,treino-rede));;dps de treinada
+                                (cond ((and (numberp numero-imagem) (< numero-imagem detectar-size))
+                                       (printf "Testando o elemento %d do arquivo t10k-images.\n" numero-imagem)
+                                       (let ((resultado
+                                              (nth (==> detectar-rede 
+                                                        test-sample detectar-db detectar-medida numero-imagem) 2))
+                                             (esperado (mostrarImagem numero-imagem)))
+                                         (printf "Esperado = %d   |   Obtido = %d \n" esperado resultado)
+                                         ))
+                                      (t (printf "Testando a rede para %d imagens.\n" detectar-size) 
+                                         (==> detectar-rede test detectar-db detectar-medida)
+                                         (==> detectar-medida display))
+                                      )
+                                )
+                              )
+                            )
+                          ))
+                     )))
+                ))
+            ))
+        ))
   
   (de new-lenet5 (image-height
                   image-width
@@ -102,18 +115,20 @@
              output-size
              net-param)))
   
-  (de mostrarImagem (imageMat labelMat numeroMat)
-      (print "Imagem:")
-      (for (i 0 27)
-           (for (j 0 27)
-                (let ((intensidade (imageMat numeroMat i j)))
-                  (cond ((< intensidade 10)  (printf "%d    " intensidade))
-                        ((< intensidade 100) (printf "%d   "  intensidade))
-                        (t                   (printf "%d  "   intensidade))
-                        )))
-           (printf "\n"))
-      (printf "Label: %d" (labelMat numeroMat))
-      )
+  (de mostrarImagem (numeroMat)
+      (let ((imagemMat (load-matrix (concat-fname *mnist-path* "t10k-images-idx3-ubyte")))
+            (labelMat (load-matrix (concat-fname *mnist-path* "t10k-labels-idx1-ubyte"))))
+        (print "Imagem:")
+        (for (i 0 27)
+             (for (j 0 27)
+                  (let ((intensidade (imagemMat numeroMat i j)))
+                    (cond ((< intensidade 10)  (printf "%d    " intensidade))
+                          ((< intensidade 100) (printf "%d   "  intensidade))
+                          (t                   (printf "%d  "   intensidade))
+                          )))
+             (printf "\n"))
+        (labelMat numeroMat)
+        ))
 #+END_SRC
 
 * LeNet-5, convolutional neural networks
