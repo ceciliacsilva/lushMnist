@@ -68,39 +68,95 @@
                       (printf "Rede treinada com %d imagens.\n\n" treino-size)
                       (eval
                        `(lambda(detectar-size &optional (numero-imagem false))
-                          (let* ((arquivos (arq-quebrar))
-                                 (matImagem (car arquivos))
-                                 (matLabel (cadr arquivos)))
-                            (let ((detectar-db
-                                   (new dsource-idx3l-narrow
-                                        (new dsource-mnist
-                                             matImagem 
-                                             matLabel
-                                             32 32 0 0.01)
-                                        detectar-size 0)))
-                              (let ((detectar-medida (new classifier-meter)))
-                                (let ((detectar-rede ,treino-rede));;dps de treinada
-                                  (cond ((and (numberp numero-imagem) (< numero-imagem detectar-size))
-                                         (printf "Testando o elemento %d do arquivo t10k-images.\n" numero-imagem)
-                                         (let ((resultado
-                                                (nth (==> detectar-rede 
-                                                          test-sample detectar-db detectar-medida numero-imagem) 2))
-                                               (esperado (mostrar-imagem numero-imagem matImagem matLabel)))
-                                           (printf "Esperado = %d   |   Obtido = %d \n" esperado resultado)
-                                           ))
-                                        (t (printf "Testando a rede para %d imagens.\n" detectar-size) 
-                                           (==> detectar-rede test detectar-db detectar-medida)
-                                           (==> detectar-medida display))
-                                        )
-                                  )
-                                )
-                              )
-                            )
-                          ))
-                      )))
-                ))
-            ))
-        ))
+                          (cond ((stringp numero-imagem)
+                                 (let* ((arquivos (arq-quebrar))
+                                        (matImagem (car arquivos))
+                                        (matLabel (cadr arquivos))
+                                        (itens (caddr arquivos)))
+                                   (let ((elemento (assoc numero-imagem itens)))
+                                     (cond (elemento
+                                            (let ((detectar-db
+                                                   (new dsource-idx3l-narrow
+                                                        (new dsource-mnist
+                                                             matImagem 
+                                                             matLabel
+                                                             32 32 0 0.01)
+                                                        detectar-size 0)))
+                                              (let ((detectar-medida (new classifier-meter)))
+                                                (let ((detectar-rede ,treino-rede));;dps de treinada
+                                                  (print itens)
+                                                  (printf 
+                                                   "Testando o elemento %s do arquivo t10k-images.\n" 
+                                                   numero-imagem)
+                                                  (let ((numero-lista (cadr elemento)))
+                                                    (print numero-lista)
+                                                    (let ((resultado
+                                                           (nth 
+                                                            (==> detectar-rede 
+                                                                 test-sample
+                                                                 detectar-db detectar-medida numero-lista) 2))
+                                                          (esperado 
+                                                           (mostrar-imagem numero-lista matImagem matLabel)))
+                                                      (printf 
+                                                       "Esperado = %d   |   Obtido = %d \n" esperado resultado)
+                                                      ))
+                                                  ))
+                                              )))
+                                     )))
+                                  ((and (numberp numero-imagem) (< numero-imagem detectar-size))
+                                   (let* ((matImagem
+                                           (load-matrix (concat-fname *mnist-path* "t10k-images-idx3-ubyte")))
+                                          (matLabel 
+                                           (load-matrix (concat-fname *mnist-path* "t10k-labels-idx1-ubyte"))))
+                                     (let ((detectar-db
+                                            (new dsource-idx3l-narrow
+                                                 (new dsource-mnist
+                                                      matImagem 
+                                                      matLabel
+                                                      32 32 0 0.01)
+                                                 detectar-size 0)))
+                                       (let ((detectar-medida (new classifier-meter)))
+                                         (let ((detectar-rede ,treino-rede));;dps de treinada
+                                           (printf 
+                                            "Testando o elemento %d do arquivo t10k-images.\n" numero-imagem)
+                                           (let ((resultado
+                                                  (nth 
+                                                   (==> detectar-rede 
+                                                        test-sample
+                                                        detectar-db detectar-medida numero-imagem) 2))
+                                                 (esperado (mostrar-imagem numero-imagem matImagem matLabel)))
+                                             (printf "Esperado = %d   |   Obtido = %d \n" esperado resultado)
+                                             ))
+                                         )
+                                       ))
+                                   )
+                                  (t (printf "Testando a rede para %d imagens.\n" detectar-size) 
+                                     (let* ((matImagem
+                                             (load-matrix (concat-fname *mnist-path* "t10k-images-idx3-ubyte")))
+                                            (matLabel
+                                             (load-matrix (concat-fname *mnist-path* "t10k-labels-idx1-ubyte"))))
+                                       (let ((detectar-db
+                                              (new dsource-idx3l-narrow
+                                                   (new dsource-mnist
+                                                      matImagem 
+                                                      matLabel
+                                                      32 32 0 0.01)
+                                                   detectar-size 0)))
+                                         (let ((detectar-medida (new classifier-meter)))
+                                           (let ((detectar-rede ,treino-rede));;dps de treinada
+                                             
+                                             (==> detectar-rede test detectar-db detectar-medida)
+                                             (==> detectar-medida display))
+                                           )))
+                                     ))
+                          )
+                       ))
+                    )
+                  ))
+              ))
+          ))
+      )
+              
   
   (de new-lenet5 (image-height
                   image-width
@@ -139,11 +195,13 @@
             (matLabel  (load-matrix (concat-fname *mnist-path* "t10k-labels-idx1-ubyte"))))
         (let* ((arquivos (files *arq-path*))
                (arqValidos (glob "([0-9].vlq)|([0-9].ccs)" arquivos)))
-          (let ((quantidade (length arqValidos)))
+          (let ((quantidade (length arqValidos))
+                (paraUsar '()))
             (for (k 1 quantidade)
                  (let* ((arqAtual (nth arqValidos k))
                         (fd (open-read (concat-fname *arq-path* arqAtual)))
-                        (labelValor (val (car (regex-split "([0-9])" arqAtual)))))
+                        (labelValor (val (car (regex-split "([0-9])" arqAtual))))
+                        (labelExt (car (regex-split "([a-z])+" arqAtual))))
                    (let* ((linhas (read-lines fd))
                           (tam (length linhas)))
                      (for (i 0 27)
@@ -160,10 +218,11 @@
                             )
                           )
                      (matLabel k labelValor)
+                     (setq paraUsar (cons (list arqAtual k) paraUsar))
                      )
                    )
                  )
-            (list matImagem matLabel)
+            (list matImagem matLabel paraUsar)
             )
           ))
       )
