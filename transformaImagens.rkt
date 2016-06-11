@@ -5,7 +5,7 @@
 (require 2htdp/image)
 
 (define *png-path* "/home/cecilia/Dropbox/8periodo/ia/nn/imagens/")
-(define *mnist-path* "/home/cecilia/Dropbox/8periodo/ia/nn/vlk/")
+(define *mnist-path* "/home/cecilia/Dropbox/8periodo/ia/nn/mnist/")
 
 (define (png->mnist file extensao)
   (let [(listaPixel (image->color-list (bitmap/file (string-append *png-path* file))))]
@@ -31,3 +31,4 @@
                      )
                    ))]
             ))))
+

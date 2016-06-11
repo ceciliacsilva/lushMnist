@@ -9,7 +9,7 @@
 (libload "gblearn2/demos/dsource-mnist")
 
 (defvar *mnist-path* "/home/cecilia/eblearn-code/demos/mnist/")
-(defvar *arq-path* "/home/cecilia/Dropbox/8periodo/ia/nn/vlk")
+(defvar *arq-path* "/home/cecilia/Dropbox/8periodo/ia/nn/mnist/")
 
 (de mnist-main (treino-size)
     (let ((treino-db
@@ -17,7 +17,7 @@
                 (new dsource-mnist 
                      (load-matrix (concat-fname *mnist-path* "train-images-idx3-ubyte"))
                      (load-matrix (concat-fname *mnist-path* "train-labels-idx1-ubyte"))
-                     32 32 0 0.01) ;;w h bias offset
+                     28 28 0 0.01) ;;w h bias offset
                 treino-size 0))) ;;cria n do dsource-mnist
       (let ((nOut 10)
             (objetivo 1))
@@ -34,7 +34,7 @@
           (let ((treino-parametro (new idx1-ddparam 0 treino-size)))
                                         ;(print treino-parametro)
             (let ((lenet-rede
-                   (new-lenet5 32 32
+                   (new-lenet5 28 28
                                5 5
                                2 2
                                5 5
@@ -68,7 +68,7 @@
                                                       (new dsource-mnist
                                                            matImagem 
                                                            matLabel
-                                                           32 32 0 0.01)
+                                                           28 28 0 0.01)
                                                       detectar-size 0)))
                                             (let ((detectar-medida (new classifier-meter)))
                                               (let ((detectar-rede ,treino-rede));;dps de treinada
@@ -101,7 +101,7 @@
                                                (new dsource-mnist
                                                     matImagem 
                                                     matLabel
-                                                    32 32 0 0.01)
+                                                    28 28 0 0.01)
                                                detectar-size 0)))
                                      (let ((detectar-medida (new classifier-meter)))
                                        (let ((detectar-rede ,treino-rede));;dps de treinada
@@ -128,7 +128,7 @@
                                                  (new dsource-mnist
                                                     matImagem 
                                                     matLabel
-                                                    32 32 0 0.01)
+                                                    28 28 0 0.01)
                                                  detectar-size 0)))
                                        (let ((detectar-medida (new classifier-meter)))
                                          (let ((detectar-rede ,treino-rede));;dps de treinada
@@ -182,7 +182,7 @@
     (let ((matImagem (load-matrix (concat-fname *mnist-path* "t10k-images-idx3-ubyte")))
           (matLabel  (load-matrix (concat-fname *mnist-path* "t10k-labels-idx1-ubyte"))))
       (let* ((arquivos (files *arq-path*))
-             (arqValidos (glob "([0-9].vlq)|([0-9].ccs)" arquivos)))
+             (arqValidos (glob "([0-9].vlq)|([0-9].ccs)|([0-9].usr)" arquivos)))
         (let ((quantidade (length arqValidos))
               (paraUsar '()))
           (for (k 1 quantidade)
