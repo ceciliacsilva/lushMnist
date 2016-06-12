@@ -1,9 +1,9 @@
 Mnist - Lush
 ------------
 
-Esse projeto é o trabalho da disciplina de Inteligência Artificial (IA), o objetivo é classificar dígitos manuscritos [0-9]. Mnist é um conjunto de imagens manuscritas e seus respectivos labels. Os conjuntos base de treinamente e testes, devem ser baixados no site "THE MNIST DATABASE of handwritten digits", http://yann.lecun.com/exdb/mnist/. Faça o download dos 4 arquivos, os dois primeiros serão usados para treinar a rede e os dois últimos serão usados em testes. Siga as instruções do site para descompactá-los.
+Esse projeto é o trabalho da disciplina de Inteligência Artificial (IA), o objetivo é classificar dígitos manuscritos [0-9]. Mnist é um conjunto de imagens manuscritas e seus respectivos labels. Os conjuntos de treinamento e testes, devem ser baixados no site "THE MNIST DATABASE of handwritten digits", http://yann.lecun.com/exdb/mnist/. Faça o download dos 4 arquivos, os dois primeiros serão usados para treinar a rede e os dois últimos para testar. Siga as instruções do site para descompactá-los.
   
-Todos as entradas serão imagens 28x28 pixels.
+Todas as entradas serão imagens 28x28 pixels.
 
 Requisitos
 ---------
@@ -22,7 +22,7 @@ Programa em Racket Language. Programa auxiliar para transformar uma imagem .png 
 	 > (load "transformaImagens.rkt")
 	 > (enter! "transformaImagens.rkt")
   
-Crie uma imagem .png, por exemplo, no GIMP (GNU Image Manipulation Program), desenhando um número de 0 a 9. Nomeie o arquivo com <digito-desenhado>.png. Lembrando sempre que esse arquivo deve ter 28x28 pixels. Considere o arquivo 0.png, disponível na pasta imagens.
+Crie uma imagem .png, por exemplo, no GIMP (GNU Image Manipulation Program), desenhando um número de 0 a 9. Nomeie o arquivo com "<digito-desenhado>.png". Lembrando sempre que esse arquivo deve ter 28x28 pixels. Considere o arquivo 0.png, disponível na pasta imagens.
 
      	 > ;(png->mnist "<digito>.png" "<extenção-mnist>")
        	 > (png->mnist "0.png" "ccs")
@@ -80,7 +80,7 @@ Verificar a resposta da rede para uma imagem específica no banco de teste.
 Testar uma imagem criada localmente, traduzida usando o programa "transformaImagem.rkt".
     
 	? ;(<nome-rede> <qtdd-imagens-teste> <digito>.<extensão>)
-        ? (rede 100 "0.ccs")
+	? (rede 100 "0.ccs")
           (("7.ccs" 19) ("9.vlq" 18) ("5.ccs" 17) ("0.vlq" 16) ("6.vlq" 15) ("3.vlq" 14) ("8.ccs" 13) ("5.vlq" 12) ("9.ccs" 11) ("3.ccs" 10) ("1.vlq" 9) ("7.vlq" 8) ("2.ccs" 7) ("6.ccs" 6) ("0.ccs" 5) ("8.vlq" 4) ("4.vlq" 3) ("4.ccs" 2) ("1.ccs" 1))
          Testando o elemento 0.ccs do arquivo t10k-images.
          "Imagem:"
