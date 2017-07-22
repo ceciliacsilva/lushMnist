@@ -53,7 +53,7 @@ Programa principal
   
 Programa em Lush. Implementação da rede neural, ou melhor 'Convolutional Neural Networks' (ConvNets), rede adaptada para processar imagens, usa o método Backpropagation (http://www.icmc.usp.br/~andre/research/neural/MLP.htm), para realizar o treinamento supervisionado, com "gradient-based training". O software usa a biblioteca "gblearn", disponível por padrão nas atuais versões do Lush.
 
-Executar './mnist_classes.mat' em *mnist-path*. -> eblearn-code/demos/mnist/
+Executar '../../bin/train mnist.conf' em *mnist-path*. -> eblearn-code/demos/mnist/
 
 Alterar os caminhos, *mnist-path* e *arq-path*, arquivo "mnistCecilia.lsh".
     
