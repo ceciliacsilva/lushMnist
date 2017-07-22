@@ -28,19 +28,40 @@ Crie uma imagem .png, por exemplo, no GIMP (GNU Image Manipulation Program), des
        	 > (png->mnist "0.png" "ccs")
   
 O arquivo "0.ccs" foi criado na mnist, ele tem um padrão proprio para ser quebrado no programa principal.
-  
+
+Eblearn
+-------
+
+Não usaremos diretamente. Instalando eblearn usando os fontes.
+
+	   $ svn checkout https://svn.code.sf.net/p/eblearn/code/trunk eblearn-code
+	   $ cd eblearn-code/tools
+	   $ make
+
+Copie os arquivos baixado no site do Yann LeCun para o diretório demos/mnist. Extraia os arquivos. Testando os dados de treinamento. Confira se os 'paths' no arquivo mnist.conf estão corretos, no meu caso:
+
+      ebl        = ${HOME}/machineLearning/eblearn-code    # eblearnroot                                                                    
+      root       = ${ebl}/demos/mnist                      # mnist data root   
+
+Comandos:
+
+	 $ cd ../demos/mnist
+	 $  ../../bin/train mnist.conf
+
 Programa principal
 ------------------
   
 Programa em Lush. Implementação da rede neural, ou melhor 'Convolutional Neural Networks' (ConvNets), rede adaptada para processar imagens, usa o método Backpropagation (http://www.icmc.usp.br/~andre/research/neural/MLP.htm), para realizar o treinamento supervisionado, com "gradient-based training". O software usa a biblioteca "gblearn", disponível por padrão nas atuais versões do Lush.
-    
+
+Executar './mnist_classes.mat' em *mnist-path*. -> eblearn-code/demos/mnist/
+
 Alterar os caminhos, *mnist-path* e *arq-path*, arquivo "mnistCecilia.lsh".
     
 Treinando a rede com 60000.
 
-	   ? (load "mnistCecilia.lsh")
-	   ? ;(defvar <nome-rede> (mnist-main <qtdd-imagens-treinar>))
-	   ? (defvar rede (mnist-main 60000))
+	  ? (load "mnistCecilia.lsh")
+	  ? ;(defvar <nome-rede> (mnist-main <qtdd-imagens-treinar>))
+	  ? (defvar rede (mnist-main 60000))
 	     Rede treinada com 60000 imagens.
   
 	    = rede
@@ -58,7 +79,7 @@ Dada uma quantidade de imagens de entrada, em quantas a rede acertou o digito de
 	      Testando a rede para 100 imagens.
 	      [60000]  size=100  energy=0.0514  correct=100.00%  errors=0.00%  rejects=0.00%
 	      = ()
-         ? (rede 1000)
+	 ? (rede 1000)
      	   Testando a rede para 1000 imagens.
 	   [60000]  size=1000  energy=0.0784  correct=99.00%  errors=1.00%  rejects=0.00%
 	      = ()  

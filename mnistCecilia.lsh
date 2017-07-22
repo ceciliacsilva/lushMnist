@@ -8,8 +8,8 @@
 (libload "gblearn2/net-cscscf")
 (libload "gblearn2/demos/dsource-mnist")
 
-(defvar *mnist-path* "/home/cecilia/eblearn-code/demos/mnist/")
-(defvar *arq-path* "/home/cecilia/Dropbox/8periodo/ia/nn/mnist/")
+(defvar *mnist-path* "/home/cecilia/machineLearning/eblearn-code/demos/mnist/")
+(defvar *arq-path* "/home/cecilia/machineLearning/lushMnist/")
 
 (de mnist-main (treino-size)
     (let ((treino-db
