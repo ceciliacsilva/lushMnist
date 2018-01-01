@@ -8,15 +8,17 @@
 (libload "gblearn2/net-cscscf")
 (libload "gblearn2/demos/dsource-mnist")
 
-(defvar *mnist-path* "/home/cecilia/machineLearning/eblearn-code/demos/mnist/")
-(defvar *arq-path* "/home/cecilia/machineLearning/lushMnist/mnist/")
+;;(defvar *mnist-path* "/home/cecilia/machineLearning/eblearn-code/demos/mnist/")
+(defvar *mnist-path* "/home/ceciliacarneiro/ufu/graduacao/ia/mnist-database/")
+;;(defvar *arq-path* "/home/cecilia/machineLearning/lushMnist/mnist/")
+(defvar *arq-path* "/home/ceciliacarneiro/ufu/graduacao/ia/lushMnist/mnist/")
 
 (de mnist-main (treino-size)
     (let ((treino-db
            (new dsource-idx3l-narrow
                 (new dsource-mnist 
-                     (load-matrix (concat-fname *mnist-path* "train-images-idx3-ubyte"))
-                     (load-matrix (concat-fname *mnist-path* "train-labels-idx1-ubyte"))
+                     (load-matrix (concat-fname *mnist-path* "train-images.idx3-ubyte"))
+                     (load-matrix (concat-fname *mnist-path* "train-labels.idx1-ubyte"))
                      28 28 0 0.01) ;;w h bias offset
                 treino-size 0))) ;;cria n do dsource-mnist
       (let ((nOut 10)
@@ -93,9 +95,9 @@
                                    )))
                                 ((and (numberp numero-imagem) (< numero-imagem detectar-size))
                                  (let* ((matImagem
-                                         (load-matrix (concat-fname *mnist-path* "t10k-images-idx3-ubyte")))
+                                         (load-matrix (concat-fname *mnist-path* "t10k-images.idx3-ubyte")))
                                         (matLabel 
-                                         (load-matrix (concat-fname *mnist-path* "t10k-labels-idx1-ubyte"))))
+                                         (load-matrix (concat-fname *mnist-path* "t10k-labels.idx1-ubyte"))))
                                    (let ((detectar-db
                                           (new dsource-idx3l-narrow
                                                (new dsource-mnist
@@ -120,9 +122,9 @@
                                  )
                                 (t (printf "Testando a rede para %d imagens.\n" detectar-size) 
                                    (let* ((matImagem
-                                           (load-matrix (concat-fname *mnist-path* "t10k-images-idx3-ubyte")))
+                                           (load-matrix (concat-fname *mnist-path* "t10k-images.idx3-ubyte")))
                                           (matLabel
-                                           (load-matrix (concat-fname *mnist-path* "t10k-labels-idx1-ubyte"))))
+                                           (load-matrix (concat-fname *mnist-path* "t10k-labels.idx1-ubyte"))))
                                      (let ((detectar-db
                                             (new dsource-idx3l-narrow
                                                  (new dsource-mnist
@@ -179,8 +181,8 @@
     )
 
 (de arq-quebrar ()
-    (let ((matImagem (load-matrix (concat-fname *mnist-path* "t10k-images-idx3-ubyte")))
-          (matLabel  (load-matrix (concat-fname *mnist-path* "t10k-labels-idx1-ubyte"))))
+    (let ((matImagem (load-matrix (concat-fname *mnist-path* "t10k-images.idx3-ubyte")))
+          (matLabel  (load-matrix (concat-fname *mnist-path* "t10k-labels.idx1-ubyte"))))
       (let* ((arquivos (files *arq-path*))
              (arqValidos (glob "([0-9].vlq)|([0-9].ccs)|([0-9].usr)" arquivos)))
         (let ((quantidade (length arqValidos))
